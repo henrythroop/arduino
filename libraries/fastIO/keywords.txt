@@ -1,0 +1,26 @@
+#######################################
+# Syntax Coloring Map for fastIO.h
+#######################################
+
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+fastPinMode             KEYWORD2
+fastDigitalWrite        KEYWORD2
+fastDigitalRead         KEYWORD2
+fastShiftOut            KEYWORD2
+fastShiftIn             KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+FAST_IO_IMPLEMENTED     LITERAL1
