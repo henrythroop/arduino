@@ -81,38 +81,77 @@ void loop()
   mapX = map(xPosition, 0, 1023, -512, 512);
   mapY = map(yPosition, 0, 1023, -512, 512);
 
-  if (mapX < -400 && mapY < -400) {
+  bool isXCenter = (mapX > -400 && mapX < 400);
+  bool isXLeft   = (mapX >  400);
+  bool isXRight  = (mapX < -400);
+  
+  bool isYCenter = (mapY > -400 && mapY < 400);
+  bool isYBack   = (mapY < -400);
+  bool isYFront  = (mapY >  400);
+
+  if (isXLeft && isYFront) { /* Forward + Left */
+    Serial.println("Forward Left");
     DriveMotor(M1,CW);
     DriveMotor(M2,CW);
-    DriveMotor(M3,CW);
-    DriveMotor(M4,CW);
-    myservo.write(0);
+    DriveMotor(M3,STOP);
+    DriveMotor(M4,STOP);
     delay(100);
-  } else if (mapX > 400 && mapY > 400) {
+  } else if (isXRight && isYFront) { /* Forward + Right */
+    Serial.println("Forward Right");
     DriveMotor(M1,CCW);
     DriveMotor(M2,CCW);
     DriveMotor(M3,CCW);
     DriveMotor(M4,CCW);
-    myservo.write(0);
+    delay(100);
+  } else if (isXRight && isYBack) { /* Backward + Right */
+    Serial.println("Backward Right");
+    DriveMotor(M1,CCW);
+    DriveMotor(M2,CCW);
+    DriveMotor(M3,CCW);
+    DriveMotor(M4,CCW);
+    delay(100);
+  } else if (isXLeft && isYBack) { /* Backward + Left */
+    Serial.println("Backward Left");
+    DriveMotor(M1,CCW);
+    DriveMotor(M2,CCW);
+    DriveMotor(M3,CCW);
+    DriveMotor(M4,CCW);
     delay(100);
   } 
-  else if (mapX > 400 && mapY < -400) {
-    DriveMotor(M1,CCW);
-    DriveMotor(M2,CCW);
-    DriveMotor(M3,CW);
-    DriveMotor(M4,CW);
-    myservo.write(0);
-    delay(100);
-  }
-    else if (mapX < -400 && mapY > 400) {
+  else if (isXCenter && isYFront) { /* Drive Forward */
+    Serial.println("Forward");
     DriveMotor(M1,CW);
     DriveMotor(M2,CW);
-    DriveMotor(M3,CCW);
-    DriveMotor(M4,CCW);
-    myservo.write(0);
+    DriveMotor(M3,CW);
+    DriveMotor(M4,CW);
     delay(100);
   }
-  else {
+    else if (isXLeft && isYCenter) { /* Drive Left */
+    Serial.println("Left");
+    DriveMotor(M1,CCW);
+    DriveMotor(M2,CCW);
+    DriveMotor(M3,STOP);
+    DriveMotor(M4,STOP);
+    delay(100);
+  }
+    else if (isXRight && isYCenter) { /* Drive Right */
+    Serial.println("Right");
+    DriveMotor(M1,STOP);
+    DriveMotor(M2,STOP);
+    DriveMotor(M3,CCW);
+    DriveMotor(M4,CCW);
+    delay(100);
+  }
+    else if (isXCenter && isYBack) { /* Drive Backward */
+    Serial.println("Backward");
+    DriveMotor(M1,CCW);
+    DriveMotor(M2,CCW);
+    DriveMotor(M3,CCW);
+    DriveMotor(M4,CCW);
+    delay(100);
+  }
+  else {                           /* If at center position */
+    Serial.println("Stop");
     DriveMotor(M1,STOP);
     DriveMotor(M2,STOP);
     DriveMotor(M3,STOP);
@@ -146,8 +185,8 @@ void DriveMotor(int Motor, int Dir)
             Action&=~(1<<Motor+1);
     }
 
-    Serial.print("Action:");
-    Serial.println(Action, HEX);
+  /*  Serial.print("Action:");
+    Serial.println(Action, HEX); */
    // delay(2000);
 
   for (int i = 0; i < 8; i++)
