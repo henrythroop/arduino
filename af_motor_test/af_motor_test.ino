@@ -1,6 +1,6 @@
 #include <AFMotor.h>
 
-AF_DCMotor motor(1);
+AF_DCMotor motor(4);
 
 void setup() 
 {

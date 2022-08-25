@@ -1,14 +1,15 @@
-#include <AFMotor.h>
+#include <AFMotor.h>  /* Adafruit 4-motor shield driver */
+                      /* Tis driver defines FORWARD, BACKWARD, RELEASE, etc. */
 
 /* This is HBT code to drive car with joystick */
 /* HBT + ARH 24-Aug-2022 */
 
 /* Set up motor stuff */
 
-AF_DCMotor motorLeftRear(1);
-AF_DCMotor motorLeftFront(2);
-AF_DCMotor motorRightFront(3);
-AF_DCMotor motorRightRear(4);
+AF_DCMotor motorLeftRear(3);  /* Figure these out bt testing w/ af_motor_test.io */
+AF_DCMotor motorLeftFront(4);
+AF_DCMotor motorRightFront(1);
+AF_DCMotor motorRightRear(2);
 
 /* Set up the joystick stuff */
 
@@ -34,7 +35,7 @@ void setup()
   pinMode(VRy, INPUT);
   pinMode(SW, INPUT_PULLUP); 
 
-  int speed = 200;
+  int speed = 255;
   
   motorLeftFront.setSpeed(speed);
   motorLeftRear.setSpeed(speed);
@@ -66,24 +67,34 @@ void loop()
     Serial.println("Forward Left");
     motorRightFront.run(FORWARD);
     motorRightRear.run(FORWARD);
+    motorLeftFront.run(RELEASE);
+    motorLeftRear.run(RELEASE);
+    
     delay(100);
   } 
   else if (isXRight && isYFront) { /* Forward + Right */
     Serial.println("Forward Right");
     motorLeftFront.run(FORWARD);
     motorLeftRear.run(FORWARD);
+    motorRightFront.run(RELEASE);
+    motorRightRear.run(RELEASE);
+    
     delay(100);
   } 
   else if (isXRight && isYBack) { /* Backward + Right */
     Serial.println("Backward Right");
-    motorLeftFront.run(BACKWARD);
-    motorLeftRear.run(BACKWARD);
+    motorLeftFront.run(RELEASE);
+    motorLeftRear.run(RELEASE);    
+    motorRightFront.run(BACKWARD);
+    motorRightRear.run(BACKWARD);
     delay(100);
   } 
   else if (isXLeft && isYBack) { /* Backward + Left */
     Serial.println("Backward Left");
-    motorRightFront.run(BACKWARD);
-    motorRightRear.run(BACKWARD);
+    motorRightFront.run(RELEASE);
+    motorRightRear.run(RELEASE);    
+    motorLeftFront.run(BACKWARD);
+    motorLeftRear.run(BACKWARD);
     delay(100);
   } 
   else if (isXCenter && isYFront) { /* Drive Forward */
@@ -96,18 +107,18 @@ void loop()
   }
     else if (isXLeft && isYCenter) { /* Turn Left */
     Serial.println("Left");
-    motorRightFront.run(BACKWARD); /* These seem backwards */
-    motorRightRear.run(BACKWARD);
-    motorLeftFront.run(FORWARD);
-    motorLeftRear.run(FORWARD);
-    delay(100);
-  }
-    else if (isXRight && isYCenter) { /* Drive Right */
-    Serial.println("Right");
-    motorRightFront.run(FORWARD);
+    motorRightFront.run(FORWARD); /* OK now */
     motorRightRear.run(FORWARD);
     motorLeftFront.run(BACKWARD);
     motorLeftRear.run(BACKWARD);
+    delay(100);
+  }
+    else if (isXRight && isYCenter) { /* Turn Right */
+    Serial.println("Right");
+    motorRightFront.run(BACKWARD); /* OK now */
+    motorRightRear.run(BACKWARD);
+    motorLeftFront.run(FORWARD);
+    motorLeftRear.run(FORWARD);
     delay(100);
   }
     else if (isXCenter && isYBack) { /* Drive Backward */
