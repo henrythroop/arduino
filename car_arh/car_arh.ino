@@ -1,31 +1,14 @@
-#include <Servo.h>
+#include <AFMotor.h>
 
 /* This is HBT code to drive car with joystick */
 /* HBT + ARH 24-Aug-2022 */
 
 /* Set up motor stuff */
-Servo myservo;
 
-#define MR 2
-#define M2PWM 3
-#define SH 4
-#define M4PWM 5
-#define M3PWM 6
-#define OE 7
-#define DS 8
-#define SERVO1 9
-#define SERVO2 10
-#define M1PWM 11
-#define ST 12
-#define M1 0
-#define M2 2
-#define M3 4
-#define M4 6
-#define STOP 0
-#define CW 1
-#define CCW 2 
-
-char pAction=0x00;
+AF_DCMotor motorLeftRear(1);
+AF_DCMotor motorLeftFront(2);
+AF_DCMotor motorRightFront(3);
+AF_DCMotor motorRightRear(4);
 
 /* Set up the joystick stuff */
 
@@ -46,28 +29,18 @@ void setup()
 /* Set up the motor stuff */
 
   Serial.begin(9600);
-  pinMode(MR, OUTPUT);
-  pinMode(M2PWM, OUTPUT);
-  pinMode(SH, OUTPUT);
-  pinMode(M4PWM, OUTPUT);
-  pinMode(M3PWM, OUTPUT);
-  pinMode(OE, OUTPUT);
-  pinMode(DS, OUTPUT);
-  pinMode(M1PWM, OUTPUT);
-  pinMode(ST, OUTPUT);
-  digitalWrite(M1PWM, HIGH);
-  digitalWrite(M2PWM, HIGH);
-  digitalWrite(M3PWM, HIGH);
-  digitalWrite(M4PWM, HIGH);
-  digitalWrite(MR, HIGH);
-  digitalWrite(OE, LOW);
-  myservo.attach(SERVO1);
-  myservo.write(0);
-
 
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
   pinMode(SW, INPUT_PULLUP); 
+
+  int speed = 200;
+  
+  motorLeftFront.setSpeed(speed);
+  motorLeftRear.setSpeed(speed);
+  motorRightFront.setSpeed(speed);
+  motorRightRear.setSpeed(speed);
+
 }
   
 void loop()
@@ -91,116 +64,65 @@ void loop()
 
   if (isXLeft && isYFront) { /* Forward + Left */
     Serial.println("Forward Left");
-    DriveMotor(M1,CW);
-    DriveMotor(M2,CW);
-    DriveMotor(M3,STOP);
-    DriveMotor(M4,STOP);
+    motorRightFront.run(FORWARD);
+    motorRightRear.run(FORWARD);
     delay(100);
-  } else if (isXRight && isYFront) { /* Forward + Right */
+  } 
+  else if (isXRight && isYFront) { /* Forward + Right */
     Serial.println("Forward Right");
-    DriveMotor(M1,CCW);
-    DriveMotor(M2,CCW);
-    DriveMotor(M3,CCW);
-    DriveMotor(M4,CCW);
+    motorLeftFront.run(FORWARD);
+    motorLeftRear.run(FORWARD);
     delay(100);
-  } else if (isXRight && isYBack) { /* Backward + Right */
+  } 
+  else if (isXRight && isYBack) { /* Backward + Right */
     Serial.println("Backward Right");
-    DriveMotor(M1,CCW);
-    DriveMotor(M2,CCW);
-    DriveMotor(M3,CCW);
-    DriveMotor(M4,CCW);
+    motorLeftFront.run(BACKWARD);
+    motorLeftRear.run(BACKWARD);
     delay(100);
-  } else if (isXLeft && isYBack) { /* Backward + Left */
+  } 
+  else if (isXLeft && isYBack) { /* Backward + Left */
     Serial.println("Backward Left");
-    DriveMotor(M1,CCW);
-    DriveMotor(M2,CCW);
-    DriveMotor(M3,CCW);
-    DriveMotor(M4,CCW);
+    motorRightFront.run(BACKWARD);
+    motorRightRear.run(BACKWARD);
     delay(100);
   } 
   else if (isXCenter && isYFront) { /* Drive Forward */
     Serial.println("Forward");
-    DriveMotor(M1,CW);
-    DriveMotor(M2,CW);
-    DriveMotor(M3,CW);
-    DriveMotor(M4,CW);
+    motorLeftFront.run(FORWARD);
+    motorLeftRear.run(FORWARD);    
+    motorRightFront.run(FORWARD);
+    motorRightRear.run(FORWARD);
     delay(100);
   }
-    else if (isXLeft && isYCenter) { /* Drive Left */
+    else if (isXLeft && isYCenter) { /* Turn Left */
     Serial.println("Left");
-    DriveMotor(M1,CCW);
-    DriveMotor(M2,CCW);
-    DriveMotor(M3,STOP);
-    DriveMotor(M4,STOP);
+    motorRightFront.run(BACKWARD); /* These seem backwards */
+    motorRightRear.run(BACKWARD);
+    motorLeftFront.run(FORWARD);
+    motorLeftRear.run(FORWARD);
     delay(100);
   }
     else if (isXRight && isYCenter) { /* Drive Right */
     Serial.println("Right");
-    DriveMotor(M1,STOP);
-    DriveMotor(M2,STOP);
-    DriveMotor(M3,CCW);
-    DriveMotor(M4,CCW);
+    motorRightFront.run(FORWARD);
+    motorRightRear.run(FORWARD);
+    motorLeftFront.run(BACKWARD);
+    motorLeftRear.run(BACKWARD);
     delay(100);
   }
     else if (isXCenter && isYBack) { /* Drive Backward */
     Serial.println("Backward");
-    DriveMotor(M1,CCW);
-    DriveMotor(M2,CCW);
-    DriveMotor(M3,CCW);
-    DriveMotor(M4,CCW);
+    motorLeftFront.run(BACKWARD);
+    motorLeftRear.run(BACKWARD);    
+    motorRightFront.run(BACKWARD);
+    motorRightRear.run(BACKWARD);
     delay(100);
   }
   else {                           /* If at center position */
     Serial.println("Stop");
-    DriveMotor(M1,STOP);
-    DriveMotor(M2,STOP);
-    DriveMotor(M3,STOP);
-    DriveMotor(M4,STOP);
+    motorLeftFront.run(RELEASE);
+    motorLeftRear.run(RELEASE);    
+    motorRightFront.run(RELEASE);
+    motorRightRear.run(RELEASE);
   }
-}
-
-int Action=0;
-void DriveMotor(int Motor, int Dir)
-{
-
-  //  Serial.print("Motor :");
-  //  Serial.println(Motor, HEX);
-  //  Serial.print("Action:");
-  //  Serial.println(Action,HEX);
-
-    if(Dir == CW)
-    {
-      Action|=(1<<Motor);
-      Action&=~(1<<Motor+1);
-    }
-
-    else if(Dir == CCW)
-    {
-      Action&=~(1<<Motor);
-      Action|=(1<<Motor+1);
-    }
-    else
-    {
-            Action&=~(1<<Motor);
-            Action&=~(1<<Motor+1);
-    }
-
-  /*  Serial.print("Action:");
-    Serial.println(Action, HEX); */
-   // delay(2000);
-
-  for (int i = 0; i < 8; i++)
-  {
-    if ((Action << i) & 0x80)
-      digitalWrite(DS, HIGH);
-    else
-      digitalWrite(DS, LOW);
-    digitalWrite(SH, HIGH);
-    delay(1);
-    digitalWrite(SH, LOW);
-  }
-  digitalWrite(ST, HIGH);
-  delay(1);
-  digitalWrite(ST, LOW);
-  pAction=Action;
 }

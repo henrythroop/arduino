@@ -1,10 +1,13 @@
 #include <Servo.h>
 
-/* This is a test code that goes through a long loop */
-/* and makes all of the motors run */
-/* This works. */
-/* From https://circuitdigest.com/microcontroller-projects/arduino-motor-driver-shield-pcb */
-/* HBT 24-Aug-2022 */
+/* This is a test code that goes through a long loop *
+ * and makes all of the motors run *
+ * This works. *
+ * It does not require any motor libraries -- it defines a short function
+ *  that does the motor driving itself
+ *
+ * From https://circuitdigest.com/microcontroller-projects/arduino-motor-driver-shield-pcb *
+ * HBT 24-Aug-2022 */
 
 Servo myservo;
 
@@ -204,77 +207,41 @@ void DriveMotor(int Motor, int Dir)
 {
 
   //  Serial.print("Motor :");
-
   //  Serial.println(Motor, HEX);
-
   //  Serial.print("Action:");
-
   //  Serial.println(Action,HEX);
-
     if(Dir == CW)
-
     {
-
       Action|=(1<<Motor);
-
       Action&=~(1<<Motor+1);
-
     }
-
     else if(Dir == CCW)
-
     {
-
       Action&=~(1<<Motor);
-
       Action|=(1<<Motor+1);
-
     }
-
     else
-
     {
-
             Action&=~(1<<Motor);
-
             Action&=~(1<<Motor+1);
-
     }
-
     Serial.print("Action:");
-
     Serial.println(Action, HEX);
-
    // delay(2000);
 
-    
-
   for (int i = 0; i < 8; i++)
-
   {
-
     if ((Action << i) & 0x80)
-
       digitalWrite(DS, HIGH);
-
     else
-
       digitalWrite(DS, LOW);
-
     digitalWrite(SH, HIGH);
-
     delay(1);
-
     digitalWrite(SH, LOW);
-
   }
 
   digitalWrite(ST, HIGH);
-
   delay(1);
-
   digitalWrite(ST, LOW);
-
   pAction=Action;
-
 }
