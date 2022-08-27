@@ -2,7 +2,7 @@
 
 int VRx = A0;
 int VRy = A1;
-int SW = 2;
+int SW = A2;
 
 int xPosition = 0;
 int yPosition = 0;
